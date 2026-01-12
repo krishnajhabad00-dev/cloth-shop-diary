@@ -101,9 +101,10 @@ let data = JSON.parse(localStorage.getItem("shop")) || [];
 
 function add(){
     let n=name.value,p=phone.value,a=amount.value;
-    if(!n||!p||!a){
-        alert("Please fill all fields");
-        return;
+        if(n==="" || p==="" || a===""){
+    alert("Please fill all fields");
+    return;
+}
     }
     data.push({
         id:Date.now(),
@@ -146,3 +147,4 @@ show();
 
 </body>
 </html>
+
