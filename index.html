@@ -3,119 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Cloth Shop Diary</title>
+    <title>Krishna Cloth Shop - Pro Diary</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 15px; }
-        .container { max-width: 600px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { text-align: center; margin-top: 0; }
-        .owner { text-align: center; font-size: 14px; color: #555; margin-bottom: 10px; }
-        .total-box { background: #ffeeba; padding: 15px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; font-size: 18px; border-left: 5px solid #ffc107; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button.add-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .card { border-bottom: 1px solid #eee; padding: 15px 0; }
-        .card b { font-size: 18px; color: #d9534f; }
-        .whatsapp-link { background: #25D366; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px; font-size: 14px; }
-        .paid-btn { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; float: right; margin-top: 10px; }
-        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 15px; color: #333; }
+        .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1a73e8; margin-bottom: 5px; }
+        .owner { text-align: center; font-size: 13px; color: #666; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        .total-box { background: #e8f0fe; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #1a73e8; }
+        .total-box span { font-size: 24px; font-weight: bold; color: #1a73e8; }
+
+        .input-group { margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .add-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        .add-btn:hover { background: #218838; }
+
+        .card { background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-top: 15px; position: relative; }
+        .card b { font-size: 18px; color: #d93025; }
+        .card .phone { color: #555; font-size: 13px; }
+        
+        /* Payment Section inside Card */
+        .pay-section { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; display: flex; gap: 5px; }
+        .pay-input { width: 60% !important; margin: 0 !important; padding: 8px !important; }
+        .pay-btn { background: #1a73e8; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex-grow: 1; font-size: 12px; }
+
+        /* History Section */
+        .history-box { margin-top: 10px; background: #fff; border: 1px solid #eee; border-radius: 4px; padding: 8px; font-size: 12px; max-height: 100px; overflow-y: auto; }
+        .hist-item { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #f1f1f1; }
+        .type-add { color: red; }
+        .type-pay { color: green; }
+
+        .whatsapp-btn { display: block; text-align: center; background: #25D366; color: white; padding: 8px; margin-top: 10px; border-radius: 4px; text-decoration: none; font-size: 14px; }
+        .del-btn { background: none; border: none; color: #999; cursor: pointer; position: absolute; top: 10px; right: 10px; font-size: 18px; }
+        .footer { text-align: center; font-size: 11px; color: #888; margin-top: 30px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>👔 Krishna Cloth Shop Diary</h2>
+    <h2>👔 Krishna Cloth Shop</h2>
     <div class="owner">Owner: Krishna Kumar Jha</div>
 
     <div class="total-box">
-        Total Udhaar: ₹ <span id="total">0</span>
+        Total Dukaan Udhaar<br>
+        <span>₹ <span id="total-val">0</span></span>
     </div>
 
-    <input type="text" id="name" placeholder="Customer Name">
-    <input type="number" id="phone" placeholder="Phone Number (e.g. 91...)">
-    <input type="number" id="amount" placeholder="Amount ₹">
-    <button class="add-btn" onclick="add()">Add / Update Customer</button>
+    <div class="input-group">
+        <input type="text" id="name" placeholder="Customer Name">
+        <input type="number" id="phone" placeholder="Phone (91xxxx)">
+        <input type="number" id="amount" placeholder="Amount (Udhaar) ₹">
+        <button class="add-btn" onclick="addCustomer()">+ Add New Udhaar</button>
+    </div>
 
-    <div id="list"></div>
+    <div id="customer-list"></div>
 
-    <div class="footer">Managed by Krishna Kumar Jha</div>
+    <div class="footer">Digital Diary Managed by Krishna Kumar Jha</div>
 </div>
 
 <script>
-    let data = JSON.parse(localStorage.getItem("shop")) || [];
+    let db = JSON.parse(localStorage.getItem("shop_pro")) || [];
 
-    function add() {
+    function addCustomer() {
         let n = document.getElementById("name").value.trim();
         let p = document.getElementById("phone").value.trim();
         let a = parseFloat(document.getElementById("amount").value);
 
-        if (n === "" || p === "" || isNaN(a)) {
-            alert("Please enter Name, Phone, and valid Amount");
+        if (!n || !p || isNaN(a)) {
+            alert("Please fill all details correctly");
             return;
         }
 
-        // Logic: Pehle check karo kya ye phone number exist karta hai?
-        let existingIndex = data.findIndex(customer => customer.p === p);
+        let index = db.findIndex(c => c.p === p);
+        let now = new Date().toLocaleString();
 
-        if (existingIndex !== -1) {
-            // Agar customer mil gaya: Naya amount purane mein jod do
-            data[existingIndex].a = parseFloat(data[existingIndex].a) + a;
-            data[existingIndex].n = n; // Name update kar rahe hain agar user ne change kiya ho
-            data[existingIndex].date = new Date().toLocaleDateString(); // Date update
-            alert("Amount added to existing account of " + n);
+        if (index !== -1) {
+            // Update existing
+            db[index].a += a;
+            db[index].history.push({ type: 'Added', amt: a, date: now });
         } else {
-            // Agar customer nahi hai: Nayi entry banao
-            data.push({
+            // Create new
+            db.push({
                 id: Date.now(),
                 n: n,
                 p: p,
                 a: a,
-                date: new Date().toLocaleDateString()
+                history: [{ type: 'Initial', amt: a, date: now }]
             });
         }
 
-        saveAndShow();
-        
-        // Inputs clear karein
-        document.getElementById("name").value = "";
-        document.getElementById("phone").value = "";
-        document.getElementById("amount").value = "";
+        save();
+        clearInputs(["name", "phone", "amount"]);
     }
 
-    function del(id) {
-        if(confirm("Are you sure this is paid?")) {
-            data = data.filter(x => x.id != id);
-            saveAndShow();
+    function recordPayment(id) {
+        let payAmt = parseFloat(document.getElementById(`pay-input-${id}`).value);
+        if (isNaN(payAmt) || payAmt <= 0) return;
+
+        let index = db.findIndex(c => c.id === id);
+        if (index !== -1) {
+            if (payAmt > db[index].a) {
+                alert("Payment amount cannot be more than balance!");
+                return;
+            }
+            db[index].a -= payAmt;
+            db[index].history.push({ type: 'Paid', amt: payAmt, date: new Date().toLocaleString() });
+            
+            // If balance is zero, we keep history but user can delete manually if they want
+            save();
         }
     }
 
-    function saveAndShow() {
-        localStorage.setItem("shop", JSON.stringify(data));
-        show();
+    function deleteRecord(id) {
+        if (confirm("Purana record delete karein?")) {
+            db = db.filter(c => c.id !== id);
+            save();
+        }
     }
 
-    function show() {
-        let list = document.getElementById("list");
-        let totalDisplay = document.getElementById("total");
-        list.innerHTML = "";
-        let sum = 0;
+    function save() {
+        localStorage.setItem("shop_pro", JSON.stringify(db));
+        render();
+    }
 
-        data.forEach(x => {
-            sum += parseFloat(x.a);
-            let msg = `Hello ${x.n}, your updated total bill ₹${x.a} is pending at Krishna Cloth Shop.`;
-            
-            list.innerHTML += `
-            <div class="card">
-                <b>${x.n}</b> <small>(${x.p})</small><br>
-                Total Udhaar: ₹${x.a}<br>
-                <span style="font-size:12px; color:#888;">Last Transaction: ${x.date}</span><br>
-                <a class="whatsapp-link" target="_blank" href="https://wa.me/${x.p}?text=${encodeURIComponent(msg)}">Send WhatsApp Reminder</a>
-                <button class="paid-btn" onclick="del(${x.id})">Clear All (Paid)</button>
-                <div style="clear:both;"></div>
-            </div>`;
+    function clearInputs(ids) {
+        ids.forEach(id => document.getElementById(id).value = "");
+    }
+
+    function render() {
+        let listDiv = document.getElementById("customer-list");
+        let totalDisplay = document.getElementById("total-val");
+        listDiv.innerHTML = "";
+        let grandTotal = 0;
+
+        db.forEach(c => {
+            grandTotal += c.a;
+            let historyHtml = c.history.map(h => `
+                <div class="hist-item">
+                    <span class="${h.type === 'Paid' ? 'type-pay' : 'type-add'}">${h.type}: ₹${h.amt}</span>
+                    <span style="color:#aaa">${h.date.split(',')[0]}</span>
+                </div>
+            `).join('');
+
+            listDiv.innerHTML += `
+                <div class="card">
+                    <button class="del-btn" onclick="deleteRecord(${c.id})">×</button>
+                    <b>${c.n}</b> <span class="phone">(${c.p})</span><br>
+                    <span style="font-size: 20px;">Balance: <b>₹${c.a}</b></span>
+                    
+                    <div class="history-box">
+                        <strong>History:</strong>
+                        ${historyHtml}
+                    </div>
+
+                    <div class="pay-section">
+                        <input type="number" id="pay-input-${c.id}" class="pay-input" placeholder="Pay Amount ₹">
+                        <button class="pay-btn" onclick="recordPayment(${c.id})">Receive Pay</button>
+                    </div>
+
+                    <a class="whatsapp-btn" target="_blank" 
+                       href="https://wa.me/${c.p}?text=${encodeURIComponent('Hello ' + c.n + ', your pending balance is ₹' + c.a + '. Please pay soon.')}">
+                       WhatsApp Reminder
+                    </a>
+                </div>
+            `;
         });
-        totalDisplay.innerText = sum;
+        totalDisplay.innerText = grandTotal;
     }
 
-    show();
+    render();
 </script>
 
 </body>
