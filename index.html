@@ -4,22 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krishna Cloth Shop Diary</title>
-
     <style>
-        /* CSS: Design styling */
         body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 15px; }
-        .container { max-width: 600px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; }
-        h2 { text-align: center; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { text-align: center; margin-top: 0; }
         .owner { text-align: center; font-size: 14px; color: #555; margin-bottom: 10px; }
-        .total { background: #ffeeba; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; }
-        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
-        button { background: #28a745; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-        .card { border-bottom: 1px solid #ddd; padding: 10px 0; }
-        .card b { color: #d9534f; }
-        .small { font-size: 12px; color: #555; }
-        .whatsapp { background: #25D366; color: #white; padding: 5px 10px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 5px; font-size: 14px; }
-        .delete { background: #dc3545; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; }
-        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 10px; }
+        .total-box { background: #ffeeba; padding: 15px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; font-size: 18px; border-left: 5px solid #ffc107; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button.add-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .card { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .card b { font-size: 18px; color: #d9534f; }
+        .whatsapp-link { background: #25D366; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px; font-size: 14px; }
+        .paid-btn { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; float: right; margin-top: 10px; }
+        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; }
     </style>
 </head>
 <body>
@@ -28,56 +25,69 @@
     <h2>👔 Krishna Cloth Shop Diary</h2>
     <div class="owner">Owner: Krishna Kumar Jha</div>
 
-    <div class="total">
+    <div class="total-box">
         Total Udhaar: ₹ <span id="total">0</span>
     </div>
 
     <input type="text" id="name" placeholder="Customer Name">
-    <input type="number" id="phone" placeholder="Phone (91xxxxxxxxxx)">
+    <input type="number" id="phone" placeholder="Phone Number (e.g. 91...)">
     <input type="number" id="amount" placeholder="Amount ₹">
-    <button onclick="add()">Add Customer</button>
+    <button class="add-btn" onclick="add()">Add / Update Customer</button>
 
     <div id="list"></div>
 
-    <hr>
     <div class="footer">Managed by Krishna Kumar Jha</div>
 </div>
 
 <script>
-    /* JavaScript: Logic to handle data */
     let data = JSON.parse(localStorage.getItem("shop")) || [];
 
     function add() {
-        // IDs ka use karke value nikalna
-        let n = document.getElementById("name").value;
-        let p = document.getElementById("phone").value;
-        let a = document.getElementById("amount").value;
+        let n = document.getElementById("name").value.trim();
+        let p = document.getElementById("phone").value.trim();
+        let a = parseFloat(document.getElementById("amount").value);
 
-        if (n === "" || p === "" || a === "") {
-            alert("Please fill all fields");
+        if (n === "" || p === "" || isNaN(a)) {
+            alert("Please enter Name, Phone, and valid Amount");
             return;
         }
 
-        data.push({
-            id: Date.now(),
-            n: n,
-            p: p,
-            a: a,
-            date: new Date().toLocaleDateString()
-        });
+        // Logic: Pehle check karo kya ye phone number exist karta hai?
+        let existingIndex = data.findIndex(customer => customer.p === p);
 
-        localStorage.setItem("shop", JSON.stringify(data));
+        if (existingIndex !== -1) {
+            // Agar customer mil gaya: Naya amount purane mein jod do
+            data[existingIndex].a = parseFloat(data[existingIndex].a) + a;
+            data[existingIndex].n = n; // Name update kar rahe hain agar user ne change kiya ho
+            data[existingIndex].date = new Date().toLocaleDateString(); // Date update
+            alert("Amount added to existing account of " + n);
+        } else {
+            // Agar customer nahi hai: Nayi entry banao
+            data.push({
+                id: Date.now(),
+                n: n,
+                p: p,
+                a: a,
+                date: new Date().toLocaleDateString()
+            });
+        }
+
+        saveAndShow();
         
-        // Input fields khali karna
+        // Inputs clear karein
         document.getElementById("name").value = "";
         document.getElementById("phone").value = "";
         document.getElementById("amount").value = "";
-        
-        show();
     }
 
     function del(id) {
-        data = data.filter(x => x.id != id);
+        if(confirm("Are you sure this is paid?")) {
+            data = data.filter(x => x.id != id);
+            saveAndShow();
+        }
+    }
+
+    function saveAndShow() {
         localStorage.setItem("shop", JSON.stringify(data));
         show();
     }
@@ -89,23 +99,22 @@
         let sum = 0;
 
         data.forEach(x => {
-            sum += Number(x.a);
-            let msg = `Hello ${x.n}, your bill ₹${x.a} is pending at Krishna Cloth Shop.`;
+            sum += parseFloat(x.a);
+            let msg = `Hello ${x.n}, your updated total bill ₹${x.a} is pending at Krishna Cloth Shop.`;
             
             list.innerHTML += `
             <div class="card">
-                <b>${x.n}</b><br>
-                ₹${x.a}<br>
-                <span class="small">Date: ${x.date}</span><br>
-                <a class="whatsapp" target="_blank" href="https://wa.me/${x.p}?text=${encodeURIComponent(msg)}">WhatsApp</a>
-                <button class="delete" onclick="del(${x.id})">Paid</button>
+                <b>${x.n}</b> <small>(${x.p})</small><br>
+                Total Udhaar: ₹${x.a}<br>
+                <span style="font-size:12px; color:#888;">Last Transaction: ${x.date}</span><br>
+                <a class="whatsapp-link" target="_blank" href="https://wa.me/${x.p}?text=${encodeURIComponent(msg)}">Send WhatsApp Reminder</a>
+                <button class="paid-btn" onclick="del(${x.id})">Clear All (Paid)</button>
                 <div style="clear:both;"></div>
             </div>`;
         });
         totalDisplay.innerText = sum;
     }
 
-    // Pehli baar load hone par data dikhana
     show();
 </script>
 
